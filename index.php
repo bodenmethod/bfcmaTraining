@@ -244,10 +244,6 @@ class sellingComputer {
 ?>
 
 
-//example 2
-
-CARS
-
 
 <?php
 
@@ -453,7 +449,7 @@ if($run_query){
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Bootstrap Example</title>
+  <title>Customers MySQL Example</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -463,14 +459,15 @@ if($run_query){
 <body>
 
 <div class="container">
-  <h2>Bordered Table</h2>
-  <p>The .table-bordered class adds borders to a table:</p>            
+  <h2>Customers</h2>
+  <p><p>            
   <table class="table table-bordered table table-hover">
     <thead>
       <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
+        <th>Full Name</th>
+        <th>Password</th>
         <th>Email</th>
+        <th>Spending Amount</th>
       </tr>
     </thead>
     <tbody>
@@ -478,25 +475,23 @@ if($run_query){
 <?php
 include('dbconnection.php');
 
-    $query = 
+    $query = "SELECT * FROM users";
 
+    $run = mysqli_query($connection, $query);
 
+    while($result = mysqli_fetch_assoc($run)){
+
+        
 ?>
 
       <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-      <tr>
-        <td>Mary</td>
-        <td>Moe</td>
-        <td>mary@example.com</td>
-      </tr>
-      <tr>
-        <td>July</td>
-        <td>Dooley</td>
-        <td>july@example.com</td>
+        <td> <?php echo $result['full_name'] ?> </td>
+        <td> <?php echo $result['password'] ?> </td>
+        <td> <?php echo $result['email'] ?> </td>
+        <td> <?php echo $result['spending_amt'] ?> </td>
+    
+<?php } mysqli_close($connection); ?>
+
       </tr>
     </tbody>
   </table>
@@ -504,3 +499,114 @@ include('dbconnection.php');
 
 </body>
 </html>
+
+
+<!-- PDO is a class that needs to be instantiated before it can be used
+
+the PDO class takes in some parameters
+
+        1. It requires you to specify the type of database, ex. mysql or pgsql etc
+
+        2. It requires your connection details, namely hostname or port number AND The database name
+
+        3. Username, password
+
+        4. It takes in options 
+
+The PDO class needs to be instantiated in a public construct method if you are creating a class or a file that contains your database connection details.
+
+
+Example: $connectionhandler = new PDO($dsn, $username, $password, $options);
+
+Where $dsn (data source name) = type of database, name of host or port and name of database.
+
+Where $option (an array variable) = that keeps set your attributes/properties, such as type or how you want your connection to be handled as if an error should occur, how you would want it to be reported. 
+
+        Example $options = array(
+
+            PDO::ATTR_PERSISTENT =>true;
+
+            PDO::ATTR_ERROR      => PDO::ERRMODE_EXCEPTION;
+
+        )
+
+Bringing it all together:
+
+public function __construct(){
+    $dbh = new PDO($dsn, Susername, $password, $options)
+}
+  -->
+
+
+<!--
+    class PDO
+
+     //The Prepare Method:
+    public function prepare{
+
+            This is used to prepare query statements | can be compared to mysqli_query()
+
+            SELECT * FROM users
+}
+
+     //The Query Method:
+    public function query{
+
+            This works like the prepare and is similar to mysqli_query()
+            }
+
+
+
+     //The lastInsertedId Method:
+    public function lastInsertedId {
+
+            This returns the last inserted id from your query result
+
+            if(lastInsertedId){
+
+                "do this"
+
+                }
+
+            }
+
+When PDO methods are executed, and are successful, they return the results as objects from the PDO Statement Class. This means that we need to use some of the methods in the PDO statement class to process the retuned results. 
+
+-->
+
+
+<!--
+    PDO Statement Class
+
+PDO Statement class defines how you want to process the result returned by the methods in the PDO class eg. post or get the data 
+
+            class PDOStatement{
+            
+             //The bindValue Method
+            public function bindValue($param, $value, $type){
+                Takes two arguements and a type
+
+                $dbh->prepare ("SELECT * FROM users WHERE id=:id AND email=:email");
+
+                 bindValue(":getid", $id, PDO::PARAM_INT);
+                 bindValue(":email", $$email, PDO::PARAM_STR);
+
+            bindValue method is completed after the prepare statement has returned the results  
+
+            }
+            }
+-->
+
+
+
+<!--
+
+    
+
+
+
+
+
+
+
+
