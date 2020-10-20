@@ -458,7 +458,11 @@ if($run_query){
 </head>
 <body>
 
-<div class="container">
+
+    <br><br><br>
+
+    <div id="greetings" class="well well-sm text-center"></div>
+
   <h2>Customers</h2>
   <p><p>            
   <table class="table table-bordered table table-hover">
@@ -468,34 +472,118 @@ if($run_query){
         <th>Password</th>
         <th>Email</th>
         <th>Spending Amount</th>
+        <th>Edit User</th>
       </tr>
     </thead>
     <tbody>
 
 <?php
-include('dbconnection.php');
+include('pdocon.php');
 
-    $query = "SELECT * FROM users";
+    $db = new Pdocon;
+    
+    $db->query("SELECT * FROM users");
 
-    $run = mysqli_query($connection, $query);
+    $results = $db->fetchMultiple();
 
-    while($result = mysqli_fetch_assoc($run)){
-
-        
-?>
+    foreach($results as $result) : ?>
 
       <tr>
         <td> <?php echo $result['full_name'] ?> </td>
         <td> <?php echo $result['password'] ?> </td>
         <td> <?php echo $result['email'] ?> </td>
         <td> <?php echo $result['spending_amt'] ?> </td>
+        <td> <a class="btn btn-primary" href="updateuser.php?user_id=<?php echo $result['id'] ?>">Edit</a> </td>
+
     
-<?php } mysqli_close($connection); ?>
+<?php  endforeach ; ?>
 
       </tr>
     </tbody>
   </table>
 </div>
+
+
+<div class="container">
+  <h2>New Customer Input form</h2>
+  <form method="post" class="form-horizontal" id="insertdata" role="form" action="processajax.php">
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="email">Email:</label>
+      <div class="col-sm-10">
+        <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="pwd">Password:</label>
+      <div class="col-sm-10">          
+        <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="password">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="email">Full Name:</label>
+      <div class="col-sm-10">
+        <input type="fullname" class="form-control" id="fullname" placeholder="Enter Full Name" name="fullname">
+      </div>
+    </div>
+    <div class="form-group">        
+      <div class="col-sm-offset-2 col-sm-10">
+        <div class="checkbox">
+          <label><input type="checkbox" name="accept" value="Accept"> Accept</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">        
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" name="submit" value="submit" class="btn btn-default">Submit</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+
+<?php 
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST"){
+
+            // collect value of input field name
+            $raw_email          =   trim($_POST['email']);
+            $raw_password       =   trim($_POST['password']);
+            $raw_fullname       =   trim($_POST['fullname']);
+            $raw_accept         =   trim($_POST['accept']);
+
+            //Validating values
+            $c_email             = filter_var($raw_email, FILTER_VALIDATE_EMAIL);
+            $c_password          = filter_var($raw_password, FILTER_SANITIZE_STRING);
+            $c_fullname          = filter_var($raw_fullname, FILTER_SANITIZE_STRING);
+            $c_accept            = filter_var($raw_accept, FILTER_SANITIZE_STRING);
+
+
+           if(isset($_POST['submit'])){
+
+            $db->query("INSERT INTO users (id, email, password, full_name, spending_amt) VALUES (NULL, :email, :password, :fullname, :spending) ");
+
+            $db->bindvalue(':email', $c_email, PDO::PARAM_STR);
+            $db->bindvalue(':password', $c_password, PDO::PARAM_STR);
+            $db->bindvalue(':fullname', $c_fullname, PDO::PARAM_STR);
+            $db->bindvalue(':spending', 500, PDO::PARAM_INT);
+
+            $run = $db->execute();
+
+            $db->confirm_result();
+
+            if($run){
+                echo "Your submission has been accepted";
+            }else{
+                echo "We were unable to complete your submission";
+            }
+
+           }
+
+        }
+
+
+?>
 
 </body>
 </html>
@@ -594,14 +682,199 @@ PDO Statement class defines how you want to process the result returned by the m
             bindValue method is completed after the prepare statement has returned the results  
 
             }
-            }
+        }
 -->
 
+<!--
+             //The execute method
+            public function execute{
 
+                Go ahead and execute the query with the binded values and parameters
+            }
+
+
+        The execution returns true when successful and false when unsuccessful
+
+        When true the methods then used are:
+
+>        fetch all rows in an Assoc array - mysqli_fetch_assoc()
+
+>        fetch a single row in an Assoc araay - mysqli_fetch_row()
+
+>        count the number of rows - mysqli_num_rows()
+
+
+        //The fetchAll method
+    public function fetchAll{
+
+        It fetches and returns all the rows in the result set from the execute method
+    }
+
+        //The fetch method
+    public function fetch{
+
+        It fetches and returns the row in the result set from the executed method
+    }
+
+        //The rowCount method
+    public function rowCount{
+
+        return the number of rows in the result set from the executed method
+    }
+
+
+
+//PDO Exception Class
+
+>reviewed in OOP text 
+>Class that has properties and methods
+>used in dpconnection.php file to receive one line of clean error code 
+
+
+-->
 
 <!--
 
+   //AJAX
+
+
+   //Concept
+
+
+   It is the use of XMLHttpRequest object - OOP / CLASS
+
+   communicates with Server Side Scripts - PHP
+
+   Returns result in HTML or text etc...
+
+
+    //When is it used
+
+    To post or load/get/request data from the server-script like PHP 
+
+
+    //How its used
+
+
+    //Framework
+
+    Ajax comes from JQUERY - > Javascript - > Java
+
+
+    //JQUERY AJAX Methods
+
+JQUERY has now simplified everything by creating methods in the AJAX object. 
+
+This means: JQUERY extended to the XMLHttpRequest() class and built on it with Methods.
+
+
+Example:
+JQUERY
+
+class ajax() extends XMLHttpRequest() {
+
+    //Properties
+
+
+    //Methods on w3schools
+
+    //$.ajax()
+    Use this to fetch data from the database with the help of PHP 
+
+    //$.post()
+    Use this to send data to the database with the help of PHP 
+
+    //$.serialize()
+    This collects and encodes all form data and attach to the $.post method and send PHP for processing.
+
+
+}
+
+
+    //$.ajax()
+
+    syntax
+
+    $.ajax({name: value, name:value...});
+
+        url:    '', - the php file that will process the data (action)
+        type:   '', - the a is how you want the data to be sent (method)
+        data:   '', - the values that you want to send with the request to the processing file
+        success: '', - to return the results to our HTML element id on the front end
+
+
+    //$.post()
+
+    $.post(URL,data,function(data,status,xhr),datatype)
+
+    //we can create variables that hold our url and data 
+    var url         = a variable holding your urldecode
+    var data        = holding your data using serialize() method 
+
+    $.post(url,data,function(alert)){
+
+        alert('Update Success');
     
+    });
+
+    --> 
+
+<!-- How to use $.ajax({})it-->
+
+<script>
+$(document).ready(function(){
+
+    $.ajax({
+
+        url:        'processajax.php',
+        type:       'POST',
+        success:    function(holdresults){
+
+            if(!holdresults.error){
+                
+                $('#greetings').html(holdresults);
+
+            }
+        }
+
+    });
+
+});
+
+</script>
+
+
+
+<!-- How to use $.post({})it-->
+
+<script>
+
+$(document).ready(function(){
+
+    $('#insertdata').submit(function(dontRefresh){
+
+        dontRefresh.preventDefault();
+
+        var url     = $(this).attr("action");
+
+        var data    = $(this).serialize();
+
+        $.post(url,data, function(resetForm){
+
+            $('#insertdata')[0].reset();
+        });
+
+    });
+
+});
+
+
+</script>
+
+
+
+
+
 
 
 
